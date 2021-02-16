@@ -1,0 +1,10 @@
+# Python stuff
+__pycache__/
+
+# JS stuff
+node_modules/
+static/
+
+# Application data
+/log/
+
