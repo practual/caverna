@@ -4,14 +4,14 @@ import {withRouter} from 'react-router';
 import socket from '../socket';
 
 const Player = withRouter(props => {
-    const {gameId, playerId: myPlayerId} = props.match.params;
+    const {gameId, playerId} = props.match.params;
 
     const emitPlayerReady = () => {
-        socket.emit('ready_player', gameId, myPlayerId);
+        socket.emit('ready_player', gameId, playerId);
     };
 
     let markReady;
-    if (props.playerId === myPlayerId) {
+    if (props.player.id === playerId) {
         markReady = (
             <button onClick={emitPlayerReady}>
                 {props.player.ready ? 'Not Ready' : 'Ready'}

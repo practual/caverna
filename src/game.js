@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 
+import ActiveGame from './active-game/active-game';
 import ReadyPlayers from './ready-players/ready-players';
 import socket from './socket';
 
@@ -28,5 +29,9 @@ export default function Game(props) {
         return null;
     }
 
-    return <ReadyPlayers players={gameState.players} />;
+    if (!gameState.started) {
+        return <ReadyPlayers players={gameState.players} />;
+    } else {
+        return <ActiveGame />;
+    }
 }

@@ -5,6 +5,7 @@ from flask import Flask, jsonify, render_template, request
 from flask_socketio import SocketIO, emit
 
 from cache import cache
+from players import find_player
 
 
 app = Flask(__name__)
@@ -23,8 +24,9 @@ def index(**kwargs):
 @app.route('/api/game', methods=['POST'])
 def create_game():
     game_id = str(uuid4())
-    update_log(game_id, 'CREATE GAME')
-    game_state = {'id': game_id}
+    num_players = int(request.args.get('players', 1))
+    update_log(game_id, 'CREATE GAME: {} players'.format(num_players))
+    game_state = {'id': game_id, 'numPlayers': num_players, 'started': False}
     cache.set(game_id, game_state)
     return game_id, 201
 
@@ -38,8 +40,8 @@ def add_player(game_id, name):
     update_log(game_id, 'ADD PLAYER: {}, {}'.format(player_id, name))
     game_state, cas = cache.gets(game_id)
     if 'players' not in game_state:
-        game_state['players'] = {}
-    game_state['players'][player_id] = {'name': name, 'ready': False}
+        game_state['players'] = []
+    game_state['players'].append({'id': player_id, 'name': name, 'ready': False})
     cache.cas(game_id, game_state, cas)
     emit('game_state', game_state, broadcast=True)
     return player_id
@@ -48,7 +50,12 @@ def add_player(game_id, name):
 def ready_player(game_id, player_id):
     update_log(game_id, 'READY PLAYER: {}'.format(player_id))
     game_state, cas = cache.gets(game_id)
-    game_state['players'][player_id]['ready'] = not game_state['players'][player_id]['ready']
+    player, idx = find_player(game_state['players'], player_id)
+    player['ready'] = not player['ready']
+    game_state['players'][idx] = player
+    num_ready = sum(player['ready'] for player in game_state['players'])
+    if num_ready == game_state['numPlayers']:
+        game_state['started'] = True
     cache.cas(game_id, game_state, cas)
     emit('game_state', game_state, broadcast=True)
 

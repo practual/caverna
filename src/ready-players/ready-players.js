@@ -30,8 +30,8 @@ const ReadyPlayers = withRouter((props) => {
             <div>
                 <h2>Players</h2>
                 <ul>
-                    {Object.entries(props.players).map(
-                        ([playerId, player]) => <Player key={playerId} playerId={playerId} player={player} />
+                    {props.players.map(
+                        player => <Player key={player.id} player={player} />
                     )}
                 </ul>
             </div>
@@ -39,10 +39,10 @@ const ReadyPlayers = withRouter((props) => {
     );
 });
 ReadyPlayers.propTypes = {
-    players: PropTypes.object,
+    players: PropTypes.array,
 };
 ReadyPlayers.defaultProps = {
-    players: {},
+    players: [],
 };
 
 export default ReadyPlayers;
