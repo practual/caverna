@@ -1,5 +1,12 @@
-appdirs==1.4.4
-distlib==0.3.1
-filelock==3.0.12
+bidict==0.21.2
+click==7.1.2
+Flask==1.1.2
+Flask-SocketIO==5.0.1
+itsdangerous==1.1.0
+Jinja2==2.11.3
+MarkupSafe==1.1.1
+pymemcache==3.4.0
+python-engineio==4.0.0
+python-socketio==5.0.4
 six==1.15.0
-virtualenv==20.4.2
+Werkzeug==1.0.1
