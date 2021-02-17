@@ -32,6 +32,6 @@ export default function Game(props) {
     if (!gameState.started) {
         return <ReadyPlayers players={gameState.players} />;
     } else {
-        return <ActiveGame />;
+        return <ActiveGame game={gameState} />;
     }
 }

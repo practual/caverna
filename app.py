@@ -5,6 +5,7 @@ from flask import Flask, jsonify, render_template, request
 from flask_socketio import SocketIO, emit
 
 from cache import cache
+from game import start_game
 from players import find_player
 
 
@@ -55,7 +56,7 @@ def ready_player(game_id, player_id):
     game_state['players'][idx] = player
     num_ready = sum(player['ready'] for player in game_state['players'])
     if num_ready == game_state['numPlayers']:
-        game_state['started'] = True
+        game_state = start_game(game_state)
     cache.cas(game_id, game_state, cas)
     emit('game_state', game_state, broadcast=True)
 
