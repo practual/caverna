@@ -1,10 +1,11 @@
-.board {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    background-color: green;
+.game {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
 }
 
-.tile {
-    grid-column: 2 / 3;
-    padding-top: 100%;
+.board-container {
+    width: 50%;
+    flex-grow: 1;
+    overflow: hidden;
 }
