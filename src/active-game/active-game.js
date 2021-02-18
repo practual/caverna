@@ -25,7 +25,7 @@ const ActiveGame = withRouter(({game, match}) => {
                 }, [])}
             </div>
             <div styleName="board-container">
-                <Board />
+                <Board board={focusPlayer.board} />
             </div>
             <Resources resources={focusPlayer.resources} />
         </div>
