@@ -1,5 +1,7 @@
 import React, {useCallback, useState} from 'react';
 
+import Resources from './resources';
+
 import './board.css';
 
 
@@ -37,6 +39,7 @@ export default function Board(props) {
                     return (
                         <div key={tile.coords} style={{gridArea}} styleName={`tile--${tile.type}`}>
                             {tile.name}
+                            <Resources resources={tile.resources} />
                         </div>
                     );
                 })}

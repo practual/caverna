@@ -28,6 +28,12 @@ const ActiveGame = withRouter(({game, match}) => {
                 <Board board={focusPlayer.board} />
             </div>
             <Resources resources={focusPlayer.resources} />
+            <div>
+                Actions
+                <ul>
+                {game.actions.map(action => <li key={action}>{action}</li>)}
+                </ul>
+            </div>
         </div>
     );
 });
