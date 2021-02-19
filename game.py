@@ -81,15 +81,16 @@ def get_action_for_turn(num_players, turn_num, actions):
         solo_actions = act.STAGE_1_ACTIONS + act.STAGE_2_ACTIONS + act.STAGE_3_ACTIONS + act.STAGE_4_ACTIONS
         return solo_actions[turn_num]
     if turn_num <= 2:
-        stage_actions = act.STAGE_1_ACTIONS,
+        stage_actions = act.STAGE_1_ACTIONS
     elif turn_num <= 5:
-        stage_actions = act.STAGE_2_ACTIONS,
+        stage_actions = act.STAGE_2_ACTIONS
     elif turn_num <= 8:
-        stage_actions = act.STAGE_3_ACTIONS,
+        stage_actions = act.STAGE_3_ACTIONS
     else:
         stage_actions = act.STAGE_4_ACTIONS
     remaining_actions = list(set(stage_actions) - set(actions))
-    return random.shuffle(remaining_actions)[0]
+    random.shuffle(remaining_actions)
+    return remaining_actions[0]
 
 
 def start_game(state):
