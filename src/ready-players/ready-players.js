@@ -18,15 +18,17 @@ const ReadyPlayers = withRouter((props) => {
 
     return (
         <div>
-            <div>
-            <label>
-                Your name:
-                <input type="text" value={name} onChange={ev => setName(ev.target.value)} />
-            </label>
-            <button type="submit" onClick={addPlayer}>
-                Join game
-            </button>
-            </div>
+            {!playerId && (
+                <div>
+                    <label>
+                        Your name:
+                        <input type="text" value={name} onChange={ev => setName(ev.target.value)} />
+                    </label>
+                    <button type="submit" onClick={addPlayer}>
+                        Join game
+                    </button>
+                </div>
+            )}
             <div>
                 <h2>Players</h2>
                 <ul>
