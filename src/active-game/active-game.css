@@ -1,11 +1,16 @@
 .game {
     display: flex;
     height: 100%;
+}
+
+.column {
+    width: 50%;
+    display: flex;
     flex-direction: column;
 }
 
 .board-container {
-    width: 50%;
+    min-height: 50%;
     flex-grow: 1;
     overflow: hidden;
 }

@@ -35,7 +35,6 @@ export default function Board(props) {
                         maxY = Math.max(maxY, y);
                     }
                     const gridArea = `${minX + 1} / ${minY + 1} / ${maxX + 1} / ${maxY + 1}`;
-                    console.log(tile);
                     return (
                         <div key={tile.coords} style={{gridArea}} styleName={`tile--${tile.type}`}>
                             {tile.name}

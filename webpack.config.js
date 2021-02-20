@@ -39,7 +39,9 @@ module.exports = {
                          localIdentName: cssScopedNameFormat,
                      },
                  },
-             }],
+             },
+             'sass-loader',
+             ],
         }],
     },
 };
