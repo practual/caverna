@@ -1,3 +1,6 @@
+import abc
+
+
 DRIFT_MINING_1 = 'drift_mining_1'
 EXCAVATION_1 = 'excavation_1'
 STARTING_PLAYER_1 = 'starting_player_1'
@@ -71,3 +74,91 @@ STAGE_4_ACTIONS = [
     ADVENTURE,
     RUBY_DELIVERY,
 ]
+
+
+class Action(metaclass=abc.ABCMeta):
+    empty = []
+    topup = []
+
+
+    def __init__(self, state):
+        self.state = state
+
+
+    def add_resources(self, current_resources):
+        if not current_resources:
+            return {
+                resource: quantity
+                for resource, quantity in self.empty or self.topup
+            }
+        return {
+            resource: current_resources.get(resource, 0) + quantity
+            for resource, quantity in self.topup
+        }
+
+
+class Logging1(Action):
+    empty = [('wood', 3)]
+    topup = [('wood', 1)]
+
+
+class WoodGathering(Action):
+    topup = [('wood', 1)]
+
+
+class Excavation1(Action):
+    topup = [('stone', 1)]
+
+
+class OreMining1(Action):
+    empty = [('ore', 2)]
+    topup = [('ore', 1)]
+
+
+class Sustenance1(Action):
+    topup = [('food', 1)]
+
+
+class RubyMining(Action):
+    @property
+    def topup(self):
+        if self.state['numPlayers'] == 2 and state['turn'] < 3:
+            return []
+        return [('ruby', 1)]
+
+
+class Housework(Action):
+    pass    
+
+
+class SlashAndBurn(Action):
+    pass
+
+
+class BlackSmithing(Action):
+    pass
+
+
+ACTION_MAP = {
+    LOGGING_1: Logging1,
+    WOOD_GATHERING: WoodGathering,
+    EXCAVATION_1: Excavation1,
+    ORE_MINING_1: OreMining1,
+    SUSTENANCE_1: Sustenance1,
+    RUBY_MINING: RubyMining,
+    HOUSEWORK: Housework,
+    SLASH_AND_BURN: SlashAndBurn,
+    BLACKSMITHING: BlackSmithing,
+}
+
+
+def add_resources(state):
+    updated_actions = []
+    for action in state['actions']:
+        action_obj = ACTION_MAP[action['id']](state)
+        updated_actions.append({
+            'id': action['id'],
+            'resources': action_obj.add_resources(action['resources'])
+        })
+    state['actions'] = updated_actions
+    return state

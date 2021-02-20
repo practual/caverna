@@ -1,11 +1,14 @@
 import React from 'react';
 
+import Resources from '../resources';
+
 import './action.css';
 
 
-const Action = ({name}) => (
+const Action = ({name, resources}) => (
     <div styleName="action">
-        {name}
+        <h3>{name}</h3>
+        {resources && <Resources resources={resources} />}
     </div>
 );
 

@@ -72,14 +72,15 @@ def get_starting_actions(num_players):
         act.HOUSEWORK,
         act.SLASH_AND_BURN,
     ))
-    return actions
+    return [{'id': action, 'resources': {}} for action in actions]
+
 
 def get_action_for_turn(num_players, turn_num, actions):
     if num_players < 3 and turn_num == 8:
         raise Exception('No turn 9 for 1 or 2 player games')
     if num_players == 1:
         solo_actions = act.STAGE_1_ACTIONS + act.STAGE_2_ACTIONS + act.STAGE_3_ACTIONS + act.STAGE_4_ACTIONS
-        return solo_actions[turn_num]
+        return {'id': solo_actions[turn_num], 'resources': {}}
     if turn_num <= 2:
         stage_actions = act.STAGE_1_ACTIONS
     elif turn_num <= 5:
@@ -90,12 +91,12 @@ def get_action_for_turn(num_players, turn_num, actions):
         stage_actions = act.STAGE_4_ACTIONS
     remaining_actions = list(set(stage_actions) - set(actions))
     random.shuffle(remaining_actions)
-    return remaining_actions[0]
+    return {'id': remaining_actions[0], 'resources': {}}
 
 
 def start_game(state):
     random.shuffle(state['players'])
-    state['turn'] = 0
+    state['turn'] = -1
     num_players = state['numPlayers']
     state['startingPlayerIdx'] = 0
     for playerIdx in range(num_players):
@@ -117,6 +118,17 @@ def start_game(state):
             'resources': {
                 'dwarfs': 2,
             },
+        }, {
+            'coords': [(2, 3)],
+            'type' :'cavern',
         }]
     state['started'] = True
     return state
+
+
+def start_turn(state):
+    state['turn'] += 1
+    action = get_action_for_turn(state['numPlayers'], state['turn'], state['actions'])
+    state['actions'].append(action)
+    state = act.add_resources(state)
+    return state, 'TURN {} STARTED. NEW ACTION: {}'.format(state['turn'], action['id'])

@@ -38,7 +38,7 @@ export default function Board(props) {
                     return (
                         <div key={tile.coords} style={{gridArea}} styleName={`tile--${tile.type}`}>
                             {tile.name}
-                            <Resources resources={tile.resources} />
+                            {tile.resources && <Resources resources={tile.resources} />}
                         </div>
                     );
                 })}

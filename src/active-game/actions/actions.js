@@ -29,9 +29,9 @@ const ACTION_MAP = Object.freeze({
 
 const Actions = ({actions}) => (
     <div styleName="actions">
-        {actions.map(actionId => {
-            const ActionComponent = ACTION_MAP[actionId];
-            return <ActionComponent key={actionId} />;
+        {actions.map(({id, resources}) => {
+            const ActionComponent = ACTION_MAP[id];
+            return <ActionComponent key={id} resources={resources} />;
         })}
     </div>
 );

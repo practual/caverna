@@ -5,7 +5,7 @@ from flask import Flask, jsonify, render_template, request
 from flask_socketio import SocketIO, emit
 
 from cache import cache
-from game import get_action_for_turn, get_starting_actions, start_game
+from game import get_action_for_turn, get_starting_actions, start_game, start_turn
 from players import find_player
 
 
@@ -62,9 +62,8 @@ def ready_player(game_id, player_id):
     num_ready = sum(player['ready'] for player in game_state['players'])
     if num_ready == game_state['numPlayers']:
         game_state = start_game(game_state)
-        action = get_action_for_turn(game_state['numPlayers'], game_state['turn'], game_state['actions'])
-        update_log(game_id, 'TURN {} STARTED. NEW ACTION: {}'.format(game_state['turn'], action))
-        game_state['actions'].append(action)
+        game_state, log_msg = start_turn(game_state)
+        update_log(game_id, log_msg)
     cache.cas(game_id, game_state, cas)
     emit('game_state', game_state, broadcast=True)
 
