@@ -4,15 +4,23 @@ import {withRouter} from 'react-router';
 import socket from '../socket';
 import Actions from './actions/actions';
 import Board from './board';
+import {ModalPortal} from './modal';
 import Resources from './resources';
 
 import './active-game.css';
 
 
 const ActiveGame = withRouter(({game, match}) => {
-    const playerId = match.params.playerId;
+    const {gameId, playerId} = match.params;
     const [focusPlayerId, setFocusPlayerId] = useState(playerId);
     const focusPlayer = game.players.find(player => player.id === focusPlayerId);
+    const myMove = game.activePlayer === playerId;
+
+    const onSelect = (actionId, data, callback) => {
+        socket.emit('use_action', gameId, playerId, actionId, data, () => {
+            callback && callback();
+        });
+    };
 
     return (
         <div styleName="game">
@@ -34,8 +42,9 @@ const ActiveGame = withRouter(({game, match}) => {
                 <Resources resources={focusPlayer.resources} />
             </div>
             <div styleName="column">
-                <Actions actions={game.actions} />
+                <Actions actions={game.actions} myMove={myMove} onSelect={onSelect} />
             </div>
+            <ModalPortal />
         </div>
     );
 });

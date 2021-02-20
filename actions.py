@@ -1,5 +1,7 @@
 import abc
 
+from players import get_next_dwarf, remove_dwarf_from_tile
+
 
 DRIFT_MINING_1 = 'drift_mining_1'
 EXCAVATION_1 = 'excavation_1'
@@ -96,10 +98,20 @@ class Action(metaclass=abc.ABCMeta):
             for resource, quantity in self.topup
         }
 
+    def process_use(self, player, action, data):
+        if not data:
+            # Default action, move dwarf to action.
+            tile_idx, dwarf = get_next_dwarf(player)
+            remove_dwarf_from_tile(player, tile_idx, dwarf)
+            action['dwarf'] = {'playerId': player['id'], 'weapon': dwarf}
+
 
 class Logging1(Action):
     empty = [('wood', 3)]
     topup = [('wood', 1)]
+
+    def process_use(self, player, action, data):
+        super().process_use(player, action, data)
 
 
 class WoodGathering(Action):
@@ -150,6 +162,12 @@ ACTION_MAP = {
     SLASH_AND_BURN: SlashAndBurn,
     BLACKSMITHING: BlackSmithing,
 }
+
+
+def find_action(actions, action_id):
+    for idx, action in enumerate(actions):
+        if action['id'] == action_id:
+            return action, idx
 
 
 def add_resources(state):

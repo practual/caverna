@@ -27,13 +27,23 @@ const ACTION_MAP = Object.freeze({
 });
 
 
-const Actions = ({actions}) => (
-    <div styleName="actions">
-        {actions.map(({id, resources}) => {
-            const ActionComponent = ACTION_MAP[id];
-            return <ActionComponent key={id} resources={resources} />;
-        })}
-    </div>
-);
+const Actions = ({actions, myMove, onSelect}) => {
+    return (
+        <div styleName="actions">
+            {actions.map(({id, resources, dwarf}) => {
+                const ActionComponent = ACTION_MAP[id];
+                return (
+                    <ActionComponent
+                        key={id}
+                        id={id}
+                        resources={resources}
+                        dwarf={dwarf}
+                        myMove={myMove}
+                        onSelect={onSelect} />
+                );
+            })}
+        </div>
+    )
+};
 
 export default Actions;

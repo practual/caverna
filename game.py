@@ -1,6 +1,7 @@
 import random
 
 import actions as act
+from players import find_player
 
 def get_starting_actions(num_players):
     actions = []
@@ -116,7 +117,7 @@ def start_game(state):
             'type': 'dwelling',
             'name': 'Entry-level dwelling',
             'resources': {
-                'dwarfs': 2,
+                'dwarfs': [0, 0],
             },
         }, {
             'coords': [(2, 3)],
@@ -131,4 +132,13 @@ def start_turn(state):
     action = get_action_for_turn(state['numPlayers'], state['turn'], state['actions'])
     state['actions'].append(action)
     state = act.add_resources(state)
+    state['activePlayer'] = state['players'][state['startingPlayerIdx']]['id']
     return state, 'TURN {} STARTED. NEW ACTION: {}'.format(state['turn'], action['id'])
+
+
+def use_action(state, player_id, action_id, data):
+    action_obj = act.ACTION_MAP[action_id](state)
+    player, _ = find_player(state['players'], player_id)
+    action, _ = act.find_action(state['actions'], action_id)
+    action_obj.process_use(player, action, data)
+    return state

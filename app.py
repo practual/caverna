@@ -5,7 +5,13 @@ from flask import Flask, jsonify, render_template, request
 from flask_socketio import SocketIO, emit
 
 from cache import cache
-from game import get_action_for_turn, get_starting_actions, start_game, start_turn
+from game import (
+    get_action_for_turn,
+    get_starting_actions,
+    start_game,
+    start_turn,
+    use_action
+)
 from players import find_player
 
 
@@ -47,7 +53,9 @@ def add_player(game_id, name):
     game_state, cas = cache.gets(game_id)
     if 'players' not in game_state:
         game_state['players'] = []
-    game_state['players'].append({'id': player_id, 'name': name, 'ready': False})
+    game_state['players'].append(
+        {'id': player_id, 'name': name, 'ready': False, 'dwarfs': 2}
+    )
     cache.cas(game_id, game_state, cas)
     emit('game_state', game_state, broadcast=True)
     return player_id
@@ -67,9 +75,14 @@ def ready_player(game_id, player_id):
     cache.cas(game_id, game_state, cas)
     emit('game_state', game_state, broadcast=True)
 
-@socketio.on('connect')
-def test_connect():
-    emit('my_response', {'data': 'Connected'})
+@socketio.on('use_action')
+def action(game_id, player_id, action_id, data):
+    game_state, cas = cache.gets(game_id)
+    game_state = use_action(game_state, player_id, action_id, data)
+    cache.cas(game_id, game_state, cas)
+    emit('game_state', game_state, broadcast=True)
+    return True
+
 
 @socketio.on('disconnect')
 def test_disconnect():
