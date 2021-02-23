@@ -5,11 +5,11 @@ import Resources from '../resources';
 import './action.css';
 
 
-const Action = ({name, resources, dwarf, myMove, onSelect}) => (
-    <div styleName="action" onClick={!dwarf && myMove ? onSelect : undefined}>
+const Action = ({name, action, myMove, onSelect}) => (
+    <div styleName="action" onClick={!action.dwarf && myMove ? onSelect : undefined}>
         <h3>{name}</h3>
-        {resources && <Resources resources={resources} />}
-        {dwarf && `(${dwarf.weapon})`}
+        {action.resources && <Resources resources={action.resources} />}
+        {action.dwarf && `(${action.dwarf.weapon})`}
     </div>
 );
 

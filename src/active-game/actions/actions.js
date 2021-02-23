@@ -30,14 +30,12 @@ const ACTION_MAP = Object.freeze({
 const Actions = ({actions, myMove, onSelect}) => {
     return (
         <div styleName="actions">
-            {actions.map(({id, resources, dwarf}) => {
-                const ActionComponent = ACTION_MAP[id];
+            {actions.map(action => {
+                const ActionComponent = ACTION_MAP[action.id];
                 return (
                     <ActionComponent
-                        key={id}
-                        id={id}
-                        resources={resources}
-                        dwarf={dwarf}
+                        key={action.id}
+                        action={action}
                         myMove={myMove}
                         onSelect={onSelect} />
                 );

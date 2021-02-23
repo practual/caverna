@@ -3,6 +3,6 @@ import React from 'react';
 import Action from './action';
 
 
-const Sustenance1 = ({resources}) => (<Action name="Sustenance" resources={resources} />);
+const Sustenance1 = props => (<Action name="Sustenance" {...props} />);
 
 export default Sustenance1;

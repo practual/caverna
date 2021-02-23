@@ -3,6 +3,6 @@ import React from 'react';
 import Action from './action';
 
 
-const Blacksmithing = () => (<Action name="Blacksmithing" />);
+const Blacksmithing = props => (<Action name="Blacksmithing" {...props} />);
 
 export default Blacksmithing;

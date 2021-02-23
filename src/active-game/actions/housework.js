@@ -3,6 +3,6 @@ import React from 'react';
 import Action from './action';
 
 
-const Housework = () => (<Action name="Housework" />);
+const Housework = props => (<Action name="Housework" {...props} />);
 
 export default Housework;

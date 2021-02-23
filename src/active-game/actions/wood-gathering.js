@@ -3,6 +3,6 @@ import React from 'react';
 import Action from './action';
 
 
-const WoodGathering = ({resources}) => (<Action name="Wood gathering" resources={resources} />);
+const WoodGathering = props => (<Action name="Wood gathering" {...props} />);
 
 export default WoodGathering;

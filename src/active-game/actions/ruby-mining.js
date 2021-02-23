@@ -3,6 +3,6 @@ import React from 'react';
 import Action from './action';
 
 
-const RubyMining = ({resources}) => (<Action name="Ruby mining" resources={resources} />);
+const RubyMining = props => (<Action name="Ruby mining" {...props} />);
 
 export default RubyMining;

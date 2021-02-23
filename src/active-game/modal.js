@@ -23,6 +23,14 @@ class ModalRegistry {
         return id;
     }
 
+    removeModal(id) {
+        const modalIdx = this.modals.find(modal => modal === id);
+        this.modals.splice(modalIdx, 1);
+        for (const listener of this.listeners) {
+            listener();
+        }
+    }
+
     addListener(fn) {
         this.listeners.push(fn);
     }
@@ -34,6 +42,7 @@ const modalRegistry = new ModalRegistry();
 export const ModalPortal = () => {
     const [isActive, setIsActive] = useState(false);
     useEffect(() => {
+        setIsActive(!!modalRegistry.activeModal);
         modalRegistry.addListener(() => {
             setIsActive(!!modalRegistry.activeModal);
         });
@@ -58,6 +67,9 @@ const Modal = ({children}) => {
         modalRegistry.addListener(() => {
             setIsActive(modalRegistry.activeModal === id);
         });
+        return () => {
+            modalRegistry.removeModal(modalId);
+        };
     }, []);
 
     if (!isActive) {

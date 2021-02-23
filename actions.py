@@ -112,6 +112,13 @@ class Logging1(Action):
 
     def process_use(self, player, action, data):
         super().process_use(player, action, data)
+        if not data:
+            action['dwarf']['progress'] = 1
+        if data and data.get('mode') == 'take_material':
+            for resource, number in action['resources'].items():
+                player['resources'][resource] = player['resources'].get(resource, 0) + number
+                action['resources'][resource] = 0
+            action['dwarf']['progress'] = 2
 
 
 class WoodGathering(Action):
