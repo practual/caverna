@@ -116,6 +116,10 @@ class Action(metaclass=abc.ABCMeta):
             for resource, quantity in self.topup:
                 self.resources[resource] = self.resources.get(resource, 0) + quantity
 
+    def take_resources(self, player):
+        player.add_resources(self.resources)
+        self.resources = {}
+
     def process_use(self, game, player, data):
         if not data:
             # Default action, move dwarf to action.
@@ -133,8 +137,7 @@ class Logging1(Action):
         if not data:
             self.dwarf['progress'] = 1
         elif data.get('mode') == 'take_material':
-            player.add_resources(self.resources)
-            self.resources = {}
+            self.take_resources(player)
             self.dwarf['progress'] = 2
             if not self.dwarf['weapon']:
                 # Dwarf without a weapon cannot go on an expedition,
@@ -145,6 +148,11 @@ class Logging1(Action):
 class WoodGathering(Action):
     action_id = WOOD_GATHERING
     topup = [('wood', 1)]
+
+    def process_use(self, game, player, data):
+        super().process_use(game, player, data)
+        self.take_resources(player)
+        return True
 
 
 class Excavation1(Action):
