@@ -48,7 +48,7 @@ const Logging1 = props => {
             )}
             {isExpeditionOpen && (
                 <Expedition
-                    number={1}
+                    level={1}
                     weapon={props.action.dwarf.weapon}
                     onReturn={onExpeditionSelected}
                 />

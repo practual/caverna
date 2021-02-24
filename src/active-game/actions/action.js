@@ -6,10 +6,10 @@ import './action.css';
 
 
 const Action = ({name, action, myMove, onSelect}) => (
-    <div styleName="action" onClick={!action.dwarf && myMove ? onSelect : undefined}>
+    <div styleName="action" onClick={!action.dwarf.playerId && myMove ? onSelect : undefined}>
         <h3>{name}</h3>
         {action.resources && <Resources resources={action.resources} />}
-        {action.dwarf && `(${action.dwarf.weapon})`}
+        {action.dwarf.playerId && `(${action.dwarf.weapon})`}
     </div>
 );
 

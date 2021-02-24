@@ -1,7 +1,5 @@
 import abc
 
-from players import get_next_dwarf, remove_dwarf_from_tile
-
 
 DRIFT_MINING_1 = 'drift_mining_1'
 EXCAVATION_1 = 'excavation_1'
@@ -82,79 +80,108 @@ class Action(metaclass=abc.ABCMeta):
     empty = []
     topup = []
 
+    @property
+    @abc.abstractmethod
+    def action_id(self):
+        pass
 
-    def __init__(self, state):
-        self.state = state
+    @classmethod
+    def deserialize(cls, state, logger):
+        action_class = ACTION_MAP[state['id']]
+        action = action_class(logger)
+        action.resources = state['resources']
+        action.dwarf = state['dwarf']
+        return action
+
+    def serialize(self):
+        return {
+            'id': self.action_id,
+            'resources': self.resources,
+            'dwarf': self.dwarf,
+        }
+
+    def __init__(self, logger):
+        self.logger = logger
+        self.resources = {}
+        self.dwarf = {}
 
 
-    def add_resources(self, current_resources):
-        if not current_resources:
-            return {
+    def add_resources(self, game):
+        if not self.resources:
+            self.resources = {
                 resource: quantity
                 for resource, quantity in self.empty or self.topup
             }
-        return {
-            resource: current_resources.get(resource, 0) + quantity
-            for resource, quantity in self.topup
-        }
+        else:
+            for resource, quantity in self.topup:
+                self.resources[resource] = self.resources.get(resource, 0) + quantity
 
-    def process_use(self, player, action, data):
+    def process_use(self, game, player, data):
         if not data:
             # Default action, move dwarf to action.
-            tile_idx, dwarf = get_next_dwarf(player)
-            remove_dwarf_from_tile(player, tile_idx, dwarf)
-            action['dwarf'] = {'playerId': player['id'], 'weapon': dwarf}
+            dwarf = player.board.remove_smallest_dwarf()
+            self.dwarf = {'playerId': player.player_id, 'weapon': dwarf}
 
 
 class Logging1(Action):
+    action_id = LOGGING_1
     empty = [('wood', 3)]
     topup = [('wood', 1)]
 
-    def process_use(self, player, action, data):
-        super().process_use(player, action, data)
+    def process_use(self, game, player, data):
+        super().process_use(game, player, data)
         if not data:
-            action['dwarf']['progress'] = 1
-        if data and data.get('mode') == 'take_material':
-            for resource, number in action['resources'].items():
-                player['resources'][resource] = player['resources'].get(resource, 0) + number
-                action['resources'][resource] = 0
-            action['dwarf']['progress'] = 2
+            self.dwarf['progress'] = 1
+        elif data.get('mode') == 'take_material':
+            player.add_resources(self.resources)
+            self.resources = {}
+            self.dwarf['progress'] = 2
 
 
 class WoodGathering(Action):
+    action_id = WOOD_GATHERING
     topup = [('wood', 1)]
 
 
 class Excavation1(Action):
+    action_id = EXCAVATION_1
     topup = [('stone', 1)]
 
 
 class OreMining1(Action):
+    action_id = ORE_MINING_1
     empty = [('ore', 2)]
     topup = [('ore', 1)]
 
 
 class Sustenance1(Action):
+    action_id = SUSTENANCE_1
     topup = [('food', 1)]
 
 
 class RubyMining(Action):
-    @property
-    def topup(self):
-        if self.state['numPlayers'] == 2 and state['turn'] < 3:
-            return []
-        return [('ruby', 1)]
+    action_id = RUBY_MINING
+
+    topup = [('ruby', 1)]
+
+    def add_resources(self, game):
+        if game.num_players == 2 and game.turn < 3:
+            return
+        return super().add_resources(game)
 
 
 class Housework(Action):
+    action_id = HOUSEWORK
     pass    
 
 
 class SlashAndBurn(Action):
+    action_id = SLASH_AND_BURN
     pass
 
 
 class BlackSmithing(Action):
+    action_id = BLACKSMITHING
     pass
 
 
@@ -169,21 +196,3 @@ ACTION_MAP = {
     SLASH_AND_BURN: SlashAndBurn,
     BLACKSMITHING: BlackSmithing,
 }
-
-
-def find_action(actions, action_id):
-    for idx, action in enumerate(actions):
-        if action['id'] == action_id:
-            return action, idx
-
-
-def add_resources(state):
-    updated_actions = []
-    for action in state['actions']:
-        action_obj = ACTION_MAP[action['id']](state)
-        updated_actions.append({
-            'id': action['id'],
-            'resources': action_obj.add_resources(action['resources'])
-        })
-    state['actions'] = updated_actions
-    return state

@@ -29,7 +29,7 @@ export default function Game(props) {
         return null;
     }
 
-    if (!gameState.started) {
+    if (gameState.turn < 0) {
         return <ReadyPlayers players={gameState.players} />;
     } else {
         return <ActiveGame game={gameState} />;

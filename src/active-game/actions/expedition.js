@@ -3,9 +3,9 @@ import React, {useState} from 'react';
 import Modal from '../modal';
 
 
-const Expedition = ({number}) => {
+const Expedition = ({level}) => {
     const [selectedResources, setSelectedResources] = useState({});
-    const itemsRemaining = number - Object.values(selectedResources).reduce((acc, el) => acc + el, 0);
+    const itemsRemaining = level - Object.values(selectedResources).reduce((acc, el) => acc + el, 0);
     return (
         <Modal>
             {`Choose your loot! ${itemsRemaining} items remaining.`}

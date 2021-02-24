@@ -1,32 +1,87 @@
-def find_player(players, player_id):
-    for idx, player in enumerate(players):
-        if player['id'] == player_id:
-            return player, idx
+from uuid import uuid4
 
 
-def get_next_dwarf(player):
-    min_weapon = float('inf')
-    tile_idx = -1
-    for idx, tile in enumerate(player['board']):
-        resources = tile.get('resources')
-        if not resources:
-            continue
-        dwarfs = resources.get('dwarfs')
-        if not dwarfs:
-            continue
-        for dwarf in dwarfs:
-            if dwarf < min_weapon:
-                tile_idx = idx
-                min_weapon = dwarf
-    return tile_idx, min_weapon
+class Player:
+    @classmethod
+    def deserialize(cls, state, logger):
+        player = cls(logger, state['name'])
+        player.player_id = state['id']
+        player.ready = state['ready']
+        player.resources = state['resources']
+        player.board = Board.deserialize(state['board'], logger)
+        return player
+
+    def serialize(self):
+        return {
+            'id': self.player_id,
+            'name': self.name,
+            'ready': self.ready,
+            'resources': self.resources,
+            'board': self.board.serialize()
+        }
+
+    def __init__(self, logger, name):
+        self.logger = logger
+        self.name = name
+        self.player_id = str(uuid4())
+        self.ready = False
+        self.resources = {}
+        self.board = Board(self.logger)
+
+    def toggle_ready(self):
+        self.ready = not self.ready
+
+    def add_resources(self, resources):
+        for resource, num in resources.items():
+            if not self.resources.get(resource):
+                self.resources[resource] = 0
+            self.resources[resource] += num
 
 
-def remove_dwarf_from_tile(player, tile_idx, weapon):
-    new_dwarfs = []
-    found_dwarf = False
-    for dwarf in player['board'][tile_idx]['resources']['dwarfs']:
-        if not found_dwarf and dwarf == weapon:
-            found_dwarf = True
-            continue
-        new_dwarfs.append(weapon)
-    player['board'][tile_idx]['resources']['dwarfs'] = new_dwarfs
+class Board:
+    @classmethod
+    def deserialize(cls, state, logger):
+        board = cls(logger)
+        board.tiles = state
+        return board
+
+    def serialize(self):
+        return self.tiles
+
+    def __init__(self, logger):
+        self.logger = logger
+        self.tiles = [{
+            'coords': [(3, 3)],
+            'type': 'dwelling',
+            'name': 'Entry-level dwelling',
+            'resources': {
+                'dwarfs': [0, 0],
+            },
+        }, {
+            'coords': [(2, 3)],
+            'type' :'cavern',
+        }]
+
+    def remove_smallest_dwarf(self):
+        min_weapon = float('inf')
+        tile_idx = -1
+        for idx, tile in enumerate(self.tiles):
+            resources = tile.get('resources')
+            if not resources:
+                continue
+            dwarfs = resources.get('dwarfs')
+            if not dwarfs:
+                continue
+            for dwarf in dwarfs:
+                if dwarf < min_weapon:
+                    tile_idx = idx
+                    min_weapon = dwarf
+        dwarfs = []
+        found_dwarf = False
+        for dwarf in self.tiles[tile_idx]['resources']['dwarfs']:
+            if not found_dwarf and dwarf != min_weapon:
+                dwarfs.append(dwarf)
+            else:
+                found_dwarf = True
+        self.tiles[tile_idx]['resources']['dwarfs'] = dwarfs
+        return min_weapon
