@@ -62,6 +62,10 @@ class Board:
             'type' :'cavern',
         }]
 
+    @property
+    def num_dwarfs(self):
+        return sum(len(tile.get('resources', {}).get('dwarfs', [])) for tile in self.tiles)
+    
     def remove_smallest_dwarf(self):
         min_weapon = float('inf')
         tile_idx = -1
@@ -79,9 +83,10 @@ class Board:
         dwarfs = []
         found_dwarf = False
         for dwarf in self.tiles[tile_idx]['resources']['dwarfs']:
-            if not found_dwarf and dwarf != min_weapon:
-                dwarfs.append(dwarf)
-            else:
+            if not found_dwarf and dwarf == min_weapon:
                 found_dwarf = True
+                continue
+            else:
+                dwarfs.append(dwarf)
         self.tiles[tile_idx]['resources']['dwarfs'] = dwarfs
         return min_weapon

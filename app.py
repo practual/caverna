@@ -70,7 +70,6 @@ def action(game_id, player_id, action_id, data):
     game_state = game.serialize()
     cache.cas(game_id, game_state, cas)
     emit('game_state', game_state, broadcast=True)
-    return True
 
 
 if __name__ == '__main__':

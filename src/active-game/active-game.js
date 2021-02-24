@@ -16,12 +16,10 @@ const ActiveGame = withRouter(({game, match}) => {
     const focusPlayer = game.players.find(player => player.id === focusPlayerId);
     const myMove = game.players[game.activePlayerIdx].id === playerId;
 
-    const onSelect = (actionId, data, callback) => {
-        socket.emit('use_action', gameId, playerId, actionId, data, () => {
-            callback && callback();
-        });
+    const onSelect = (actionId, data) => {
+        socket.emit('use_action', gameId, playerId, actionId, data);
     };
-console.log(focusPlayer);
+
     return (
         <div styleName="game">
             <div styleName="column">

@@ -136,6 +136,10 @@ class Logging1(Action):
             player.add_resources(self.resources)
             self.resources = {}
             self.dwarf['progress'] = 2
+            if not self.dwarf['weapon']:
+                # Dwarf without a weapon cannot go on an expedition,
+                # so reach terminal state here.
+                return True
 
 
 class WoodGathering(Action):

@@ -90,14 +90,15 @@ class Game:
             return self.players[(self.active_player_idx + num_passes) % self.num_players]
         p = 1
         player = _advance_priority(p)
-        while not len(player.board.dwarfs):
+        while not player.board.num_dwarfs:
             p += 1
             if p > self.num_players:
-                break
+                return self.harvest()
             player = _advance_priority(p)
-        else:
-            return self.harvest()
         self.active_player_idx = (self.active_player_idx + p) % self.num_players
+
+    def harvest(self):
+        pass
 
     def _get_player_by_id(self, player_id):
         for player in self.players:

@@ -6,18 +6,16 @@ import Expedition from './expedition';
 
 
 const Logging1 = props => {
-    const [isModalOpen, setIsModalOpen] = useState(props.action.dwarf?.progress >= 1);
     const [isExpeditionOpen, setIsExpeditionOpen] = useState(false);
-
-    const openModal = () => {
-        props.onSelect(props.action.id);
-        setIsModalOpen(true);
+    let isModalOpen = !isExpeditionOpen && !!props.action.dwarf?.progress;
+    if (props.action.dwarf?.progress > 1 && !props.action.dwarf.weapon) {
+        isModalOpen = false;
     }
+
     const onSelectMaterial = () => {
         props.onSelect(props.action.id, {'mode': 'take_material'});
     };
     const onSelectExpedition = () => {
-        setIsModalOpen(false);
         setIsExpeditionOpen(true);
     };
     const onExpeditionSelected = () => {
@@ -38,7 +36,7 @@ const Logging1 = props => {
     }
     return (
         <>
-            <Action name="Logging" {...props} onSelect={openModal} />
+            <Action name="Logging" {...props} />
             {isModalOpen && (
                 <Modal>
                     {takeMaterial}
