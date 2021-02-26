@@ -6,6 +6,12 @@ from actions import Action
 from players import Player
 
 
+NO_HARVEST = 'no_harvest'
+ONE_FOOD = 'one_food'
+FULL_HARVEST = 'full_harvest'
+PLAYERS_CHOICE = 'players_choice'
+
+
 class Game:
     @classmethod
     def deserialize(cls, state, logger):
@@ -16,9 +22,11 @@ class Game:
             game.players.append(Player.deserialize(player, logger))
         for action in state['actions']:
             game.actions.append(Action.deserialize(action, logger))
+        game.harvests = state['harvests']
         game.turn = state['turn']
         game.starting_player_idx = state['startingPlayerIdx']
         game.active_player_idx = state['activePlayerIdx']
+        game.phase = state['phase']
         return game
 
     def serialize(self):
@@ -27,9 +35,11 @@ class Game:
             'numPlayers': self.num_players,
             'players': [player.serialize() for player in self.players],
             'actions': [action.serialize() for action in self.actions],
+            'harvests': self.harvests,
             'turn': self.turn,
             'startingPlayerIdx': self.starting_player_idx,
             'activePlayerIdx': self.active_player_idx,
+            'phase': self.phase,
         }
 
     def __init__(self, logger):
@@ -39,9 +49,11 @@ class Game:
         self.num_players = 1
         self.players = []
         self.actions = []
+        self.harvests = []
         self.turn = -1
         self.starting_player_idx = 0
         self.active_player_idx = 0
+        self.phase = 'work'
 
     def add_player(self, name):
         player = Player(self.logger, name)
@@ -74,6 +86,7 @@ class Game:
     def advance_turn(self):
         self.turn += 1
         self.actions.append(self._get_action_for_turn())
+        self.harvests.append(self._get_harvest_for_turn())
         for action in self.actions:
             action.add_resources(self)
         self.active_player_idx = self.starting_player_idx
@@ -98,7 +111,20 @@ class Game:
         self.active_player_idx = (self.active_player_idx + p) % self.num_players
 
     def harvest(self):
-        pass
+        for action in self.actions:
+            if not action.dwarf:
+                continue
+            dwarf = action.remove_dwarf()
+            player = self._get_player_by_id(dwarf['playerId'])
+            player.board.add_dwarf(dwarf['weapon'])
+
+        harvest = self.harvests[self.turn]
+        if harvest == NO_HARVEST:
+            return self.advance_turn()
+        elif harvest == FULL_HARVEST:
+            # TODO: Reap crops
+            self.phase = 'harvest'
+            # TODO: Breed animals
 
     def _get_player_by_id(self, player_id):
         for player in self.players:
@@ -208,3 +234,29 @@ class Game:
         remaining_actions = list(set(stage_actions) - set(action.action_id for action in self.actions))
         random.shuffle(remaining_actions)
         return act.ACTION_MAP[remaining_actions[0]](self.logger)
+
+    def _get_harvest_for_turn(self):
+        if self.turn <= 1:
+            return NO_HARVEST
+        if self.turn == 2 or self.turn == 4:
+            return FULL_HARVEST
+        if self.turn == 3:
+            return ONE_FOOD
+        if self.num_players < 3 and self.turn == 8:
+            raise Exception('No turn 9 for 1 or 2 player games')
+        num_full_harvests = 3 if self.num_players < 3 else 4
+        num_used_full_harvests = 0
+        num_used_bonus_harvests = 0
+        for harvest in self.harvests[5:]:
+            if harvest == FULL_HARVEST:
+                num_used_full_harvests += 1
+            else:
+                num_used_bonus_harvests += 1
+        num_remaining_full_harvests = num_full_harvests - num_used_full_harvests
+        num_remaining_bonus_harvests = 3 - num_used_bonus_harvests
+        random_harvests = [FULL_HARVEST] * num_remaining_full_harvests + ['bonus'] * num_remaining_bonus_harvests
+        random.shuffle(random_harvests)
+        next_harvest = random_harvests[0]
+        if next_harvest == FULL_HARVEST:
+            return FULL_HARVEST
+        return [NO_HARVEST, ONE_FOOD, PLAYERS_CHOICE][num_used_bonus_harvests]

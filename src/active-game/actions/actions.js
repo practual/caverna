@@ -5,8 +5,10 @@ import {ACTIONS} from './constants';
 import Excavation1 from './excavation1';
 import Housework from './housework';
 import Logging1 from './logging1';
+import OreMineConstruction from './ore-mine-construction';
 import OreMining1 from './ore-mining1';
 import RubyMining from './ruby-mining';
+import SheepFarming from './sheep-farming';
 import SlashAndBurn from './slash-and-burn';
 import Sustenance1 from './sustenance1';
 import WoodGathering from './wood-gathering';
@@ -24,6 +26,8 @@ const ACTION_MAP = Object.freeze({
    [ACTIONS.HOUSEWORK]: Housework,
    [ACTIONS.SLASH_AND_BURN]: SlashAndBurn,
    [ACTIONS.BLACKSMITHING]: Blacksmithing,
+   [ACTIONS.SHEEP_FARMING]: SheepFarming,
+   [ACTIONS.ORE_MINE_CONSTRUCTION]: OreMineConstruction,
 });
 
 

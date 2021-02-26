@@ -126,6 +126,11 @@ class Action(metaclass=abc.ABCMeta):
             dwarf = player.board.remove_smallest_dwarf()
             self.dwarf = {'playerId': player.player_id, 'weapon': dwarf}
 
+    def remove_dwarf(self):
+        dwarf = self.dwarf
+        self.dwarf = {}
+        return dwarf
+
 
 class Logging1(Action):
     action_id = LOGGING_1
@@ -184,17 +189,22 @@ class RubyMining(Action):
 
 class Housework(Action):
     action_id = HOUSEWORK
-    pass    
 
 
 class SlashAndBurn(Action):
     action_id = SLASH_AND_BURN
-    pass
 
 
 class BlackSmithing(Action):
     action_id = BLACKSMITHING
-    pass
+
+
+class SheepFarming(Action):
+    action_id = SHEEP_FARMING
+
+
+class OreMineConstruction(Action):
+    action_id = ORE_MINE_CONSTRUCTION
 
 
 ACTION_MAP = {
@@ -207,4 +217,6 @@ ACTION_MAP = {
     HOUSEWORK: Housework,
     SLASH_AND_BURN: SlashAndBurn,
     BLACKSMITHING: BlackSmithing,
+    SHEEP_FARMING: SheepFarming,
+    ORE_MINE_CONSTRUCTION: OreMineConstruction,
 }

@@ -90,3 +90,15 @@ class Board:
                 dwarfs.append(dwarf)
         self.tiles[tile_idx]['resources']['dwarfs'] = dwarfs
         return min_weapon
+
+    def add_dwarf(self, dwarf):
+        for tile in self.tiles:
+            if tile['type'] != 'dwelling':
+                continue
+            if not tile.get('resources'):
+                tile['resources'] = {}
+            if not tile['resources'].get('dwarfs'):
+                tile['resources']['dwarfs'] = []
+            if len(tile['resources']['dwarfs']) < 2:
+                tile['resources']['dwarfs'].append(dwarf)
+                break
